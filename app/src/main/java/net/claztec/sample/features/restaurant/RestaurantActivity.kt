@@ -32,9 +32,16 @@ class RestaurantActivity : AppCompatActivity() {
 
             viewModel.restaurants.observe(this@RestaurantActivity) { result ->
                     restaurantAdapter.submitList(result)
-                    binding.progreeBar.visibility = View.INVISIBLE
                     restaurantAdapter.notifyDataSetChanged()
 
+            }
+
+            viewModel.loadingFlag.observe(this@RestaurantActivity) { flag ->
+                if (flag) {
+                    binding.progreeBar.visibility = View.VISIBLE
+                } else {
+                    binding.progreeBar.visibility = View.INVISIBLE
+                }
             }
 
             buttonDeleteItem.setOnClickListener {
@@ -42,6 +49,8 @@ class RestaurantActivity : AppCompatActivity() {
                 viewModel.deleteItem()
 //                restaurantAdapter.notifyDataSetChanged()
             }
+
+
         }
 
     }

@@ -1,11 +1,11 @@
 package net.claztec.sample.features.restaurant
 
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.claztec.sample.data.Restaurant
 import net.claztec.sample.data.RestaurantRepository
@@ -18,12 +18,21 @@ class RestaurantViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _restaurants = MutableLiveData<List<Restaurant>>()
-    val restaurants:LiveData<List<Restaurant>> = _restaurants
+    private val _loadingFlag = MutableLiveData<Boolean>(false)
+    val restaurants: LiveData<List<Restaurant>> = _restaurants
+    val loadingFlag: LiveData<Boolean> = _loadingFlag
+
 
     init {
         viewModelScope.launch {
-            val data = repository.getRestaurants1()
-            _restaurants.postValue(data)
+            repository.getRestaurants().collect { result ->
+                if (result is Resource.Success) {
+                    _restaurants.postValue(result.data!!)
+                    _loadingFlag.value = false
+                } else if (result is Resource.Loading) {
+                    _loadingFlag.value = true
+                }
+            }
         }
 
     }
@@ -33,12 +42,6 @@ class RestaurantViewModel @Inject constructor(
             val data = _restaurants.value
             val subList = data?.subList(0, (data.size / 2).toInt())
             _restaurants.postValue(subList!!)
-        //            val aa = repository.getRestaurants1()
-//            _restaurants.postValue(aa)
-//            restaurants = repository.delete().map{it.data}.asLiveData()
-//            Log.d("뷰모델", "리파지토리 딜리트 ")
-//        val emptyList = List<Restaurant>()
-//        restaurants.value =
         }
     }
 }
