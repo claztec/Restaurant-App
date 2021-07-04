@@ -2,11 +2,15 @@ package net.claztec.sample.features.restaurant
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import net.claztec.sample.R
+import net.claztec.sample.data.Restaurant
 import net.claztec.sample.databinding.ActivityRestaurantBinding
+import net.claztec.sample.util.Resource
 
 @AndroidEntryPoint
 class RestaurantActivity : AppCompatActivity() {
@@ -26,10 +30,25 @@ class RestaurantActivity : AppCompatActivity() {
                 layoutManager = LinearLayoutManager(this@RestaurantActivity)
             }
 
-            viewModel.restaurants.observe(this@RestaurantActivity) {
-                restaurants -> restaurantAdapter.submitList(restaurants)
+            viewModel.restaurants.observe(this@RestaurantActivity) { result ->
+                if (result is Resource.Success) {
+                    restaurantAdapter.submitList(result.data)
+                    binding.progreeBar.visibility = View.INVISIBLE
+                    restaurantAdapter.notifyDataSetChanged()
+                }
+                else if (result is Resource.Loading) {
+                    binding.progreeBar.visibility = View.VISIBLE
+                } else if (result is Resource.Error) {
+                    Toast.makeText(this@RestaurantActivity, "에러가 발생", Toast.LENGTH_LONG).show()
+                }
+
             }
 
+            buttonDeleteItem.setOnClickListener {
+                Log.d("액티비티", "딜리트 버튼 클릭")
+                viewModel.deleteItem()
+//                restaurantAdapter.notifyDataSetChanged()
+            }
         }
 
     }

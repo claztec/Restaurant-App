@@ -12,5 +12,6 @@ interface RestaurantApi {
     @GET("restaurant/random_restaurant?size=20")
     suspend fun getRestaurants(): List<Restaurant>
 
-
+    @GET("restaurant/random_restaurant?size=10")
+    suspend fun getRestaurants2(): List<Restaurant>
 }

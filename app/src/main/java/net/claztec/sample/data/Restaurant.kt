@@ -1,8 +1,8 @@
 package net.claztec.sample.data
 
 data class Restaurant(
-    val name: String,
+    var name: String,
     val type: String,
     val logo: String,
-    val address: String
+    var address: String
 )
