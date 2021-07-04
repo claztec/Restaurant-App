@@ -22,6 +22,11 @@ class RestaurantRepository @Inject constructor(
         }
     }
 
+    suspend fun getRestaurants1(): List<Restaurant> {
+        return api.getRestaurants()
+    }
+
+
     fun delete(): Flow<Resource<out List<Restaurant>>> = flow {
         Log.d("리파지토리", "딜리트")
         emit(Resource.Loading(null))

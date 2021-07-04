@@ -1,10 +1,7 @@
 package net.claztec.sample.features.restaurant
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -20,43 +17,28 @@ class RestaurantViewModel @Inject constructor(
     private val repository: RestaurantRepository
 ) : ViewModel() {
 
-    private fun upper(restaurants: List<Restaurant>?): List<Restaurant> {
-        for (restaurant in restaurants!!) {
-            restaurant.address = restaurant.address.toUpperCase()
+    private val _restaurants = MutableLiveData<List<Restaurant>>()
+    val restaurants:LiveData<List<Restaurant>> = _restaurants
+
+    init {
+        viewModelScope.launch {
+            val data = repository.getRestaurants1()
+            _restaurants.postValue(data)
         }
 
-        return restaurants
     }
 
-    private var _restaurant = repository.getRestaurants().map {
-        delay(100)
-//        for (item in it.data!!) {
-//            item.name = item.name.toUpperCase()
-//        }
-//        it
-        if (it.data != null) {
-            val aaaa = upper(it.data)
-            Resource.Success(aaaa)
-        } else {
-            it
-        }
-    }.asLiveData(
-
-    )
-
-    val restaurants: LiveData<Resource<out List<Restaurant>>>
-        get() = _restaurant
-
     fun deleteItem() {
-//        val value = _restaurant.value
-//        value?.data?.subList(0, value?.data?.size?:0)
-//        restaurants.value = Resource.Success()
-//        _restaurant = repository.delete().asLiveData()
-//        _restaurant = repository.delete().asLiveData()
-
         viewModelScope.launch {
-            _restaurant = repository.delete().asLiveData()
-            Log.d("뷰모델", "리파지토리 딜리트 ")
+            val data = _restaurants.value
+            val subList = data?.subList(0, (data.size / 2).toInt())
+            _restaurants.postValue(subList!!)
+        //            val aa = repository.getRestaurants1()
+//            _restaurants.postValue(aa)
+//            restaurants = repository.delete().map{it.data}.asLiveData()
+//            Log.d("뷰모델", "리파지토리 딜리트 ")
+//        val emptyList = List<Restaurant>()
+//        restaurants.value =
         }
     }
 }

@@ -31,16 +31,9 @@ class RestaurantActivity : AppCompatActivity() {
             }
 
             viewModel.restaurants.observe(this@RestaurantActivity) { result ->
-                if (result is Resource.Success) {
-                    restaurantAdapter.submitList(result.data)
+                    restaurantAdapter.submitList(result)
                     binding.progreeBar.visibility = View.INVISIBLE
                     restaurantAdapter.notifyDataSetChanged()
-                }
-                else if (result is Resource.Loading) {
-                    binding.progreeBar.visibility = View.VISIBLE
-                } else if (result is Resource.Error) {
-                    Toast.makeText(this@RestaurantActivity, "에러가 발생", Toast.LENGTH_LONG).show()
-                }
 
             }
 
